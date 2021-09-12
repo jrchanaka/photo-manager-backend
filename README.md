@@ -1,6 +1,7 @@
 ## Tested Environment
  
  * Node: V12
+ * Mysql 8
 
  ## Steps to setup
 
