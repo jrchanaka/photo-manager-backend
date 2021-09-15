@@ -13,7 +13,7 @@ export class UsersController {
 
     @Get('/:id')
     async getUserInfo(@Param('id') id: string): Promise<UserResponse> {
-        return await this.usersService.getUserInfo(id);        
+        return this.usersService.getUserInfo(id);        
     }
 
 }

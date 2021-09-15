@@ -7,6 +7,8 @@ import { SavePhotosDTO } from './dtos/savePhotos.dto';
 import { PhotosEntity } from './entities/photos.entity';
 import { PhotosRepository } from './repositories/photos.repository';
 import { sortBy } from 'lodash';
+import { UsersService } from 'src/users/users.service';
+import { UserResponse } from 'src/users/dtos/user.response.dto';
 
 @Injectable()
 export class PhotosService {
@@ -16,29 +18,39 @@ export class PhotosService {
      */
     constructor(
         @InjectRepository(PhotosEntity)
-        private readonly photosRepository: PhotosRepository
-    ) { }
+        private readonly photosRepository: PhotosRepository,
+        private usersService: UsersService
+        ) {}
 
     /**
      * Get photos list of the user
      * @param userId 
      */
     async getPhotosByUserId(userId: string): Promise<PhotosResponse[]> {
-        const user: any = MOCKED_DATA.author;
+        const user: UserResponse = this.usersService.getUserInfo(userId);
 
-        if (user.id === userId) {
-            const entries: any = MOCKED_DATA.entries;
-            const photoResponse: PhotosResponse[] = [];
-
-            entries.map((entry) => {
-                photoResponse.push(new PhotosResponse(entry.id, entry.message, entry.picture, entry.timestamp));
-            });
-
-            return photoResponse;
-        }
-        else {
+        if (!user) {
             throw new HttpException(VALIDATION.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
+
+        const entries: any = MOCKED_DATA.entries;
+        const photoResponse: PhotosResponse[] = [];
+
+        entries.map((entry) => {
+            photoResponse.push(
+                new PhotosResponse(
+                    entry.id, 
+                    entry.message, 
+                    entry.picture, 
+                    entry.pictureSmall, 
+                    entry.pictureMedium, 
+                    entry.pictureStored, 
+                    entry.timestamp
+                )
+            );
+        });
+
+        return photoResponse;
     }
 
     /**
@@ -47,6 +59,7 @@ export class PhotosService {
      */
     async savePhotosByUserId(userId: string, photoData: SavePhotosDTO[]): Promise<any> {
         try {
+            // Sort acending order by order parameter
             const orderedPhotoList: SavePhotosDTO[] = sortBy(photoData, ['order']);
 
             await this.photosRepository.delete({ userId: Number(userId) });
