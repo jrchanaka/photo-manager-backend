@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserResponse } from './dtos/user.response.dto';
 import * as MOCKED_DATA from '../data/photos.data.json';
-import { VALIDATION } from 'src/config/const';
+import { VALIDATION } from '../../src/config/const';
 
 @Injectable()
 export class UsersService {

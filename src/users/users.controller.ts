@@ -12,7 +12,7 @@ export class UsersController {
      constructor(private usersService: UsersService) {}
 
     @Get('/:id')
-    async getUserInfo(@Param('id') id: string): Promise<UserResponse> {
+    getUserInfo(@Param('id') id: string): UserResponse {
         return this.usersService.getUserInfo(id);        
     }
 

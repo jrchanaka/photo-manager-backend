@@ -1,14 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { COMMON_MESSAGES, VALIDATION } from 'src/config/const';
+import { COMMON_MESSAGES, VALIDATION } from '../../src/config/const';
 import * as MOCKED_DATA from '../data/photos.data.json';
 import { PhotosResponse } from './dtos/photos.response.dto';
 import { SavePhotosDTO } from './dtos/savePhotos.dto';
 import { PhotosEntity } from './entities/photos.entity';
 import { PhotosRepository } from './repositories/photos.repository';
 import { sortBy } from 'lodash';
-import { UsersService } from 'src/users/users.service';
-import { UserResponse } from 'src/users/dtos/user.response.dto';
+import { UsersService } from '../../src/users/users.service';
+import { UserResponse } from '../../src/users/dtos/user.response.dto';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PhotosService {
@@ -17,8 +18,7 @@ export class PhotosService {
      * @param photosRepository 
      */
     constructor(
-        @InjectRepository(PhotosEntity)
-        private readonly photosRepository: PhotosRepository,
+        @InjectRepository(PhotosEntity) private readonly photosRepository: Repository<PhotosEntity>,
         private usersService: UsersService
         ) {}
 
@@ -26,7 +26,7 @@ export class PhotosService {
      * Get photos list of the user
      * @param userId 
      */
-    async getPhotosByUserId(userId: string): Promise<PhotosResponse[]> {
+    getPhotosByUserId(userId: string): PhotosResponse[] {
         const user: UserResponse = this.usersService.getUserInfo(userId);
 
         if (!user) {
@@ -57,7 +57,7 @@ export class PhotosService {
      * Save photos list of the user
      * @param userId 
      */
-    async savePhotosByUserId(userId: string, photoData: SavePhotosDTO[]): Promise<any> {
+    async savePhotosByUserId(userId: string, photoData: SavePhotosDTO[]): Promise<PhotosEntity[]> {
         try {
             // Sort acending order by order parameter
             const orderedPhotoList: SavePhotosDTO[] = sortBy(photoData, ['order']);
@@ -73,7 +73,7 @@ export class PhotosService {
      * Get photos list of the user
      * @param userId 
      */
-     async getSavedPhotosByUserId(userId: string): Promise<any> {
+     async getSavedPhotosByUserId(userId: string): Promise<PhotosEntity[]> {
         try {
             return await this.photosRepository.find({ userId: Number(userId) });
         } catch (error) {
