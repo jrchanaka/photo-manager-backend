@@ -3,6 +3,9 @@
  * Node: V12
  * Mysql 8
 
+## Unit tests
+ * Please run "npm run test" to run unit test cases
+
  ## Steps to setup
 
  * Clone the project
